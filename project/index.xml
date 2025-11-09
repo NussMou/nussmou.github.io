@@ -6,6 +6,21 @@
     <description>Recent content in Project on Nuss Mou Blog</description>
     <generator>Hugo -- 0.152.2</generator>
     <language>zh-tw</language>
+    <lastBuildDate>Sun, 09 Nov 2025 21:27:36 +0800</lastBuildDate>
     <atom:link href="https://nussmou.github.io/project/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TrackNet</title>
+      <link>https://nussmou.github.io/project/tracknet/</link>
+      <pubDate>Sun, 09 Nov 2025 21:27:36 +0800</pubDate>
+      <guid>https://nussmou.github.io/project/tracknet/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Start and Installation</title>
+      <link>https://nussmou.github.io/project/tracknet/installation/</link>
+      <pubDate>Sun, 09 Nov 2025 00:00:00 +0000</pubDate>
+      <guid>https://nussmou.github.io/project/tracknet/installation/</guid>
+      <description>introduction, env and execution</description>
+    </item>
   </channel>
 </rss>

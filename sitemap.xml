@@ -2,10 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://nussmou.github.io/paper/llm-distillation-survey/</loc>
-    <lastmod>2025-11-09T21:27:02+08:00</lastmod>
-  </url><url>
     <loc>https://nussmou.github.io/</loc>
+    <lastmod>2025-11-09T21:27:36+08:00</lastmod>
+  </url><url>
+    <loc>https://nussmou.github.io/project/</loc>
+    <lastmod>2025-11-09T21:27:36+08:00</lastmod>
+  </url><url>
+    <loc>https://nussmou.github.io/project/tracknet/</loc>
+    <lastmod>2025-11-09T21:27:36+08:00</lastmod>
+  </url><url>
+    <loc>https://nussmou.github.io/paper/llm-distillation-survey/</loc>
     <lastmod>2025-11-09T21:27:02+08:00</lastmod>
   </url><url>
     <loc>https://nussmou.github.io/paper/</loc>
@@ -17,12 +23,11 @@
     <loc>https://nussmou.github.io/posts/</loc>
     <lastmod>2025-11-09T20:51:22+08:00</lastmod>
   </url><url>
+    <loc>https://nussmou.github.io/project/tracknet/installation/</loc>
+    <lastmod>2025-11-09T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://nussmou.github.io/categories/</loc>
   </url><url>
-    <loc>https://nussmou.github.io/project/</loc>
-  </url><url>
     <loc>https://nussmou.github.io/tags/</loc>
-  </url><url>
-    <loc>https://nussmou.github.io/project/tracknet/</loc>
   </url>
 </urlset>
