@@ -114,8 +114,8 @@
   "keywords": [
     
   ],
-  "articleBody": "Introduction： 本來的 TrackNet 是一個追蹤羽球的模型，具體架構在 Paper 那個 subpage。所以這裡第一個目標是把它轉成針對桌球的。 以下 repo 是別人改的 pytorch version，然而仍比較簡陋一些，所以增加了 pretrain(freeze some layer) and DDP 兩個部分，使其可以 使用較少的 dataset 達到足夠好的效果 使用 multiGPU 進行 training 其他目標是進行球速的測量，以及減少 inference 的時間，同時還開發了簡易的 label tool 以及 evaluation tool，方便標資料和量化成果。 note：此 model 有一缺陷是，即使 training 到最後，也難以偵測發球拋球的桌球（因為不是計畫重點，所以也沒嘗試 improve），所以在 evaluation 時，我通常會 ignore 拋球的那段時間 label and evaluation tool 會放在 related-tools 的 subpage 有關 data 角度：這是一個沒有透過多機位還原成3D的模型，球速主要也只重視水平位移，所以盡可能俯拍，減少透視造成的誤差。 env 因為沒有 AI 直接動我的 code 的需求，所以還沒改成 uv，這裡是用 pyenv+virtualvenv 管理 env git clone https://github.com/ChgygLin/TrackNetV2-pytorch.git pyenv virtualenv 3.9.8 tracknet398 pip install --upgrade pip pip install -r requirements.txt requirements.txt 的具體版本如下： # requirements.txt numpy==1.24.4 scipy==1.8.1 scikit-learn==1.3.2 scikit-image==0.20.0 pandas==2.1.3 sympy==1.12 mpmath==1.3.0 # === 影像處理/增強 === albumentations==1.3.0 opencv-python==4.8.1.78 Pillow==10.1.0 imageio==2.31.5 tifffile==2023.9.26 # === 視覺化 === matplotlib==3.8.2 contourpy==1.2.0 cycler==0.12.1 fonttools==4.45.1 kiwisolver==1.4.5 pyparsing==3.1.1 # === PyTorch + CUDA === torch==2.1.1 torchvision==0.16.1 torchsummary==1.5.1 triton==2.1.0 nvidia-cublas-cu12==12.1.3.1 nvidia-cuda-cupti-cu12==12.1.105 nvidia-cuda-nvrtc-cu12==12.1.105 nvidia-cuda-runtime-cu12==12.1.105 nvidia-cudnn-cu12==8.9.2.26 nvidia-cufft-cu12==11.0.2.54 nvidia-curand-cu12==10.3.2.106 nvidia-cusolver-cu12==11.4.5.107 nvidia-cusparse-cu12==12.1.0.106 nvidia-nccl-cu12==2.18.1 nvidia-nvjitlink-cu12==12.3.101 nvidia-nvtx-cu12==12.1.105 # === ONNX === onnx==1.15.0 onnx2torch==1.5.13 protobuf==4.25.1 # === 日誌/訓練工具 === tensorboardX==2.6.2.2 tqdm==4.66.1 packaging==23.2 typing_extensions==4.8.0 # === Flask 相關 === Flask==3.0.0 Werkzeug==3.0.1 click==8.1.7 itsdangerous==2.1.2 Jinja2==3.1.2 MarkupSafe==2.1.3 blinker==1.7.0 # === 其他依賴 === filelock==3.13.1 fsspec==2023.10.0 idna==3.4 urllib3==2.1.0 requests==2.31.0 certifi==2023.11.17 charset-normalizer==3.3.2 python-dateutil==2.8.2 pytz==2023.3.post1 tzdata==2023.3 six==1.16.0 networkx==3.2.1 original training command 可以透過 –weights xxx.pt 來進行 pretrain python train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 50 --batch-size 8 --project runs/... \u003e /mnt/storage/opentt/... 2\u003e\u00261 DDP training command torchrun --nproc_per_node=8 train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 20 --batch-size 16 --project runs/xxx \u003e /mnt/storage/opentt/xxx.log 2\u003e\u00261 the last version torchrun --nproc_per_node=8 train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 30 --batch-size 16 --project proj_name \u003e /mnt/storage/opentt/xxx.l_2og 2\u003e\u00261 其中最重要的是 yaml file，yaml file 如下 images 有不同的影片 frame，是 0-based index labels 要有標記的 csv file，column order is frame_num,visible,x,y path: /mnt/storage/opentt train: - game3_55s_1m35s_clip/images - 60FPS_merged/images - 120FPS_merged/images val: - game3_55s_1m35s_clip/images - 60FPS_merged/images - 120FPS_merged/images nc: 1 names: ['ball'] 由於後來 dataset 變大( 接近 10000 frame )，又採取 10 in 10 out 的策略，所以 epoch 在 20 ~ 30 之間收斂。 我在 training 時都是 8 張卡 DDP ，之後會在 DDP subpage 說明具體速度上的差異 inference command: the last version python detect.py --source C0012.mp4 --weights runs/train_10in10out_2/best.pt --save-txt --project proj_name ",
-  "wordCount" : "308",
+  "articleBody": "Introduction： 本來的 TrackNet 是一個追蹤羽球的模型，具體架構在 Paper 那個 subpage。所以這裡第一個目標是把它轉成針對桌球的。 以下 repo 是別人改的 pytorch version，然而仍比較簡陋一些，所以增加了 pretrain(freeze some layer) and DDP 兩個部分，使其可以 使用較少的 dataset 達到足夠好的效果 使用 multiGPU 進行 training 其他目標是進行球速的測量，以及減少 inference 的時間，同時還開發了簡易的 label tool 以及 evaluation tool，方便標資料和量化成果。 note：此 model 有一缺陷是，即使 training 到最後，也難以偵測發球拋球的桌球（因為不是計畫重點，所以也沒嘗試 improve），所以在 evaluation 時，我通常會 ignore 拋球的那段時間 label and evaluation tool 會放在 related-tools 的 subpage 有關 data 角度：這是一個沒有透過多機位還原成3D的模型，球速主要也只重視水平位移，所以盡可能俯拍，減少透視造成的誤差。 env 因為沒有 AI 直接動我的 code 的需求，所以還沒改成 uv，這裡是用 pyenv+virtualvenv 管理 env # 原始版本 git clone https://github.com/ChgygLin/TrackNetV2-pytorch.git # 也可以用這個（10 in 10 out 的版本） git clone https://github.com/NussMou/TrackNet.git pyenv virtualenv 3.9.8 tracknet398 pip install --upgrade pip pip install -r requirements.txt requirements.txt 的具體版本如下： # requirements.txt numpy==1.24.4 scipy==1.8.1 scikit-learn==1.3.2 scikit-image==0.20.0 pandas==2.1.3 sympy==1.12 mpmath==1.3.0 # === image processing === albumentations==1.3.0 opencv-python==4.8.1.78 Pillow==10.1.0 imageio==2.31.5 tifffile==2023.9.26 # === visualization === matplotlib==3.8.2 contourpy==1.2.0 cycler==0.12.1 fonttools==4.45.1 kiwisolver==1.4.5 pyparsing==3.1.1 # === PyTorch + CUDA === torch==2.1.1 torchvision==0.16.1 torchsummary==1.5.1 triton==2.1.0 nvidia-cublas-cu12==12.1.3.1 nvidia-cuda-cupti-cu12==12.1.105 nvidia-cuda-nvrtc-cu12==12.1.105 nvidia-cuda-runtime-cu12==12.1.105 nvidia-cudnn-cu12==8.9.2.26 nvidia-cufft-cu12==11.0.2.54 nvidia-curand-cu12==10.3.2.106 nvidia-cusolver-cu12==11.4.5.107 nvidia-cusparse-cu12==12.1.0.106 nvidia-nccl-cu12==2.18.1 nvidia-nvjitlink-cu12==12.3.101 nvidia-nvtx-cu12==12.1.105 # === ONNX === onnx==1.15.0 onnx2torch==1.5.13 protobuf==4.25.1 # === journal and training tool === tensorboardX==2.6.2.2 tqdm==4.66.1 packaging==23.2 typing_extensions==4.8.0 # === Flask === Flask==3.0.0 Werkzeug==3.0.1 click==8.1.7 itsdangerous==2.1.2 Jinja2==3.1.2 MarkupSafe==2.1.3 blinker==1.7.0 # === other dependency === filelock==3.13.1 fsspec==2023.10.0 idna==3.4 urllib3==2.1.0 requests==2.31.0 certifi==2023.11.17 charset-normalizer==3.3.2 python-dateutil==2.8.2 pytz==2023.3.post1 tzdata==2023.3 six==1.16.0 networkx==3.2.1 original training command 可以透過 –weights xxx.pt 來進行 pretrain python train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 50 --batch-size 8 --project runs/... \u003e /mnt/storage/opentt/... 2\u003e\u00261 DDP training command torchrun --nproc_per_node=8 train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 20 --batch-size 16 --project runs/xxx \u003e /mnt/storage/opentt/xxx.log 2\u003e\u00261 the last version torchrun --nproc_per_node=8 train.py --data /mnt/storage/opentt/game3_55s_1m35s_clip/tabletennis.yaml --epochs 30 --batch-size 16 --project proj_name \u003e /mnt/storage/opentt/xxx.l_2og 2\u003e\u00261 其中最重要的是 yaml file，yaml file 如下 images 有不同的影片 frame，是 0-based index labels 要有標記的 csv file，column order is frame_num,visible,x,y path: /mnt/storage/opentt train: - game3_55s_1m35s_clip/images - 60FPS_merged/images - 120FPS_merged/images val: - game3_55s_1m35s_clip/images - 60FPS_merged/images - 120FPS_merged/images nc: 1 names: ['ball'] 由於後來 dataset 變大( 接近 10000 frame )，又採取 10 in 10 out 的策略，所以 epoch 在 20 ~ 30 之間收斂。 我在 training 時都是 8 張卡 DDP ，之後會在 DDP subpage 說明具體速度上的差異 inference command:\nthe last version python detect.py --source C0012.mp4 --weights runs/train_10in10out_2/best.pt --save-txt --project proj_name 目前 weight 已經在 /mnt/storage/opentt/train_10in10out_2/best.pt\nC0012 也是 /mnt/storage/opentt/C0012.mp4\n",
+  "wordCount" : "330",
   "inLanguage": "en",
   "datePublished": "2025-11-09T00:00:00Z",
   "dateModified": "2025-11-09T00:00:00Z",
@@ -214,7 +214,10 @@
 <ul>
 <li>因為沒有 AI 直接動我的 code 的需求，所以還沒改成 uv，這裡是用 pyenv+virtualvenv 管理 env</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/ChgygLin/TrackNetV2-pytorch.git
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 原始版本</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/ChgygLin/TrackNetV2-pytorch.git
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 也可以用這個（10 in 10 out 的版本）</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/NussMou/TrackNet.git
 </span></span><span style="display:flex;"><span>pyenv virtualenv 3.9.8 tracknet398
 </span></span><span style="display:flex;"><span>pip install --upgrade pip
 </span></span><span style="display:flex;"><span>pip install -r requirements.txt
@@ -229,14 +232,14 @@ scikit-image==0.20.0
 pandas==2.1.3
 sympy==1.12
 mpmath==1.3.0
-# === 影像處理/增強 ===
+# === image processing ===
 albumentations==1.3.0
 opencv-python==4.8.1.78
 Pillow==10.1.0
 imageio==2.31.5
 tifffile==2023.9.26
 
-# === 視覺化 ===
+# === visualization ===
 matplotlib==3.8.2
 contourpy==1.2.0
 cycler==0.12.1
@@ -267,13 +270,13 @@ onnx==1.15.0
 onnx2torch==1.5.13
 protobuf==4.25.1
 
-# === 日誌/訓練工具 ===
+# === journal and training tool ===
 tensorboardX==2.6.2.2
 tqdm==4.66.1
 packaging==23.2
 typing_extensions==4.8.0
 
-# === Flask 相關 ===
+# === Flask  ===
 Flask==3.0.0
 Werkzeug==3.0.1
 click==8.1.7
@@ -282,7 +285,7 @@ Jinja2==3.1.2
 MarkupSafe==2.1.3
 blinker==1.7.0
 
-# === 其他依賴 ===
+# === other dependency ===
 filelock==3.13.1
 fsspec==2023.10.0
 idna==3.4
@@ -336,12 +339,19 @@ names: [&#39;ball&#39;]
 </ul>
 <hr>
 <ul>
-<li>inference command:
+<li>
+<p>inference command:</p>
 <ul>
 <li>the last version</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python detect.py --source C0012.mp4  --weights runs/train_10in10out_2/best.pt --save-txt --project  proj_name
 </span></span></code></pre></div></li>
+<li>
+<p>目前 weight 已經在 /mnt/storage/opentt/train_10in10out_2/best.pt</p>
+</li>
+<li>
+<p>C0012 也是 /mnt/storage/opentt/C0012.mp4</p>
+</li>
 </ul>
 
 
